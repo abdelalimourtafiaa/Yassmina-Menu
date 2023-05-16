@@ -1,19 +1,24 @@
 class ProduitModel {
-  int id_produit =0 ;
-  String name = "";
-  String description = "";
-  double prix =0 ;
-  String image = "";
+  int? id_produit;
+  String? name;
+  String? description;
+  double? prix;
+  String? image ;
 
   ProduitModel(
-      this.id_produit, this.name, this.description, this.prix, this.image);
+      {required this.id_produit,
+        required this.name,
+        required this.description,
+        required this.prix,
+        required this.image});
 
-  ProduitModel.fromJson(Map json)
-     :id_produit=json['id_produit'],
-        name=json['name'],
-        description=json['description'],
-        prix=json['prix'],
-        image=json['image'];
-
-
+  factory ProduitModel.fromJson(Map<String, dynamic> json) {
+    return ProduitModel(
+      id_produit: json['id_produit'],
+      name: json['name'] ,
+      description: json['description'] ,
+      prix: double.parse(json['prix'].toString()) ,
+      image: json['image'] ,
+    );
+  }
 }
