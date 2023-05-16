@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:core';
+
 
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -7,9 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:menu/CallApi.dart';
 import 'package:menu/SplashScreen.dart';
 import 'package:menu/instagram.dart';
+import 'package:menu/model/CategorieModel.dart';
+import 'package:menu/services/category_service.dart';
+import 'package:menu/services/product_services.dart';
 import 'package:menu/slider.dart';
+import 'constants/Url.dart';
 import 'facebook.dart';
 import 'model/ProduitModel.dart';
+import 'model/apiRespons.dart';
 
 
 void main() {
@@ -39,7 +46,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _searchQueryController = TextEditingController();
 
-  var articles = <ProduitModel>[];
+
+
 // list of titles
   static List<String> ProductName = ['title1','title2','title3'];
   // list of images
@@ -55,6 +63,71 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
   }
+
+
+  //Product list
+  List<ProduitModel> products = [];
+  List<CategorieModel> category = [];
+
+// Product list
+  void getProduct() async {
+    try {
+      ApiResponse response = await fetchProducts();
+      if (response.error == null && mounted) {
+        setState(() {
+          products = response.data as List<ProduitModel>;
+        });
+      } else if (response.error == 'unauthorized') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${response.error}')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to fetch products')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    }
+  }
+  void getCategory() async {
+    try {
+      ApiResponse response = await fetchCategorys();
+      if (response.error == null && mounted) {
+        setState(() {
+          category = response.data as List<CategorieModel>;
+        });
+      } else if (response.error == 'unauthorized') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${response.error}')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to fetch products')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    }
+  }
+
+
 
 
   void showMyDialog(BuildContext context) {
@@ -124,19 +197,18 @@ class _MyHomePageState extends State<MyHomePage> {
   late PageController _pageController;
   int _currentIndex = 0;
 
+
+
   void initState() {
     super.initState();
-    print("fetching....");
     _pageController = PageController(initialPage: 0);
     startTimer();
-    this._getProducts();
+
+    getProduct();
+    getCategory();
   }
-  _getProducts(){
-    CallApi().getProductData('getrecent').then((response){
-      Iterable list = json.decode(response.body);
-      articles =list.map((model) => ProduitModel.fromJson(model)).toList();
-    });
-  }
+
+
 
   @override
   void dispose() {
@@ -285,170 +357,72 @@ class _MyHomePageState extends State<MyHomePage> {
                            ],
                          ),
                        ),
-
                       const SizedBox(height: 15,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children :[
-                              // button for breakfast
-                              ElevatedButton(
+
+
+                       /*    ElevatedButton(
                             onPressed: () {
                               _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
                               setState(() {
                                 _currentIndex = 0;
                               });
-
                             },
-                             style: ButtonStyle(
-                               backgroundColor: MaterialStateProperty.all<Color>(
-                                 _currentIndex == 0 ? Colors.redAccent : Colors.white,
-                               ),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                _currentIndex == 0 ? Colors.redAccent : Colors.white,
+                              ),
                               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30.0),
-                               ),
-                                 ),
-                                ),
-                                  child: Row(
-                                   children: [
-                                       Icon(
-                                       Icons.menu_book,
-                                       color: _isPressed ? Colors.white : Colors.black,
-                                        ),
-                                         SizedBox(width: 10),
-                                       Text(
-                                         'Petite Déjouner',
-                                         style: TextStyle(
-                                           fontSize: 24,
-                                           color: _currentIndex == 0 ? Colors.white : Colors.black,
-                                                ),
-                                        ),
-                                   ],
-                                    ),
-                           ),
-                              // button for drinks
-                              ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _currentIndex = 1;
-                                  });
-
-                                  _pageController.animateToPage(1, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all<Color>(
-                                    _currentIndex == 1 ? Colors.redAccent : Colors.white,
-                                  ),
-                                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                                        (Set<MaterialState> states) {
-                                      if (states.contains(MaterialState.pressed))
-                                        return Colors.redAccent; //<-- SEE HERE
-                                      return null; // Defer to the widget's default.
-                                    },
-                                  ),
-                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0), // <-- SET THE BORDER RADIUS HERE
-                                    ),
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.coffee_outlined,
-                                      color: Colors.black,),
-                                    SizedBox(width: 10,),
-                                    Text(
-                                      'boissons',
-                                      style: TextStyle(fontSize: 24 ,
-                                        color: _currentIndex == 1 ? Colors.white : Colors.black,
-                                      ),
-                                    ),
-                                  ],
                                 ),
                               ),
-                              // button for Patisserie
-                              ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _currentIndex = 2;
-                                  });
-
-                                  _pageController.animateToPage(2, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all<Color>(
-                                    _currentIndex == 2 ? Colors.redAccent : Colors.white,
-                                  ),
-                                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                                        (Set<MaterialState> states) {
-                                      if (states.contains(MaterialState.pressed))
-                                        return Colors.redAccent; //<-- SEE HERE
-                                      return null; // Defer to the widget's default.
-                                    },
-                                  ),
-                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0), // <-- SET THE BORDER RADIUS HERE
-                                    ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.menu_book,
+                                  color: _currentIndex == 0 ? Colors.white : Colors.black,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  'Petite Déjouner',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: _currentIndex == 0 ? Colors.white : Colors.black,
                                   ),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.local_cafe_sharp,
-                                      color: Colors.black,),
-                                    SizedBox(width: 10,),
-                                    Text(
-                                      'Patisserie',
-                                      style: TextStyle(fontSize: 24 ,
-                                        color: _currentIndex == 2 ? Colors.white : Colors.black,
-                                      ),
+                              ],
+                            ),
+                          ),*/
+
+                      SizedBox(
+                        height: 50,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: category.length,
+                          itemBuilder: (context, index) {
+                            CategorieModel currentCategory = category[index];
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                color: Colors.blue,
+                                child: Center(
+                                  child: Text(
+                                    currentCategory.name_category!,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                              // button for viennoiseries & sec
-                              ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _currentIndex = 3;
-                                  });
-
-                                  _pageController.animateToPage(3, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all<Color>(
-                                    _currentIndex == 3 ? Colors.redAccent : Colors.white,
-                                  ),
-                                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                                        (Set<MaterialState> states) {
-                                      if (states.contains(MaterialState.pressed))
-                                        return Colors.redAccent; //<-- SEE HERE
-                                      return null; // Defer to the widget's default.
-                                    },
-                                  ),
-                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0), // <-- SET THE BORDER RADIUS HERE
-                                    ),
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.coffee_outlined,
-                                      color: Colors.black,),
-                                    SizedBox(width: 10,),
-                                    Text(
-                                      'viennoiseries & sec',
-                                      style: TextStyle(fontSize: 24 ,
-                                        color: _currentIndex == 3 ? Colors.white : Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                            ],
+                            );
+                          },
                         ),
+                      ),
 
                       const SizedBox(height: 15,),
                       SizedBox(
@@ -464,20 +438,20 @@ class _MyHomePageState extends State<MyHomePage> {
                             //List for BreakFast
                             ListView.builder(
                               padding: EdgeInsets.only(bottom: 10),
-                              itemCount: (4 / 3).ceil(),
+                              itemCount: (products!.length / 3).ceil(),
                               itemBuilder: (BuildContext context, int index) {
                                 int startingIndex = index * 3;
-
                                 return GridView.count(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
                                   crossAxisCount: 3,
                                   children: List.generate(
-                                    (startingIndex + 3 <= 4)
+                                    (startingIndex + 3 <= products!.length)
                                         ? 3
-                                        : 4 - startingIndex,
+                                        : products!.length - startingIndex,
                                         (i) {
                                       int currentIndex = startingIndex + i;
+                                      final product = products[currentIndex];
                                       return Column(
                                         children: [
                                           GestureDetector(
@@ -491,7 +465,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   ClipRRect(
                                                     borderRadius: BorderRadius.circular(35.0),
                                                     child: Image.asset(
-                                                      'Icons/breakfast.png',
+                                                      product.image!
+                                                      ,
                                                       width: 270,
                                                       height: 270,
                                                     ),
@@ -501,7 +476,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             ),
                                           ),
                                           Text(
-                                            "tiiitle",
+                                            product.name!,
                                             style: TextStyle(
                                               color: Colors.black54,
                                               fontSize: 20.0,
@@ -673,9 +648,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 );
                               },
                             ),
-
-
-
+                            
                           ],
                         ),
                       ),
