@@ -403,18 +403,53 @@ class _MyHomePageState extends State<MyHomePage> {
                           itemBuilder: (context, index) {
                             CategorieModel currentCategory = category[index];
                             return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                width: 100,
-                                height: 100,
-                                color: Colors.blue,
+                              padding: const EdgeInsets.all(10.0),
+                              child: Expanded(
                                 child: Center(
-                                  child: Text(
-                                    currentCategory.name_category!,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _currentIndex = index;
+                                      });
+                                      _pageController.animateToPage(
+                                        1,
+                                        duration: Duration(milliseconds: 500),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    },
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all<Color>(
+                                        _currentIndex == index ? Colors.redAccent : Colors.white,
+                                      ),
+                                      overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                                            (Set<MaterialState> states) {
+                                          if (states.contains(MaterialState.pressed))
+                                            return Colors.redAccent;
+                                          return null;
+                                        },
+                                      ),
+                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30.0),
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                         Container(
+                                          width: 24,
+                                          height: 24,
+                                          child: Image.asset(currentCategory.icon!),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          currentCategory.name_category!,
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            color: _currentIndex == index ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -422,6 +457,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             );
                           },
                         ),
+
                       ),
 
                       const SizedBox(height: 15,),
@@ -648,7 +684,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 );
                               },
                             ),
-                            
+
                           ],
                         ),
                       ),
