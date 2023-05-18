@@ -5,6 +5,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import 'instagram.dart';
 import 'main.dart';
+import 'view.dart';
 
 void main() {
   runApp(
