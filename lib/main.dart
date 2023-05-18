@@ -69,8 +69,10 @@ class _MyHomePageState extends State<MyHomePage> {
   List<ProduitModel> products = [];
   List<CategorieModel> category = [];
 
+  CategorieModel? selectedCategory;
+
 // Product list
-  void getProduct() async {
+  /*void getProduct() async {
     try {
       ApiResponse response = await fetchProducts();
       if (response.error == null && mounted) {
@@ -97,13 +99,15 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       }
     }
-  }
-  void getCategory() async {
+  }*/
+  void getProductByCategory(int categoryId) async {
     try {
-      ApiResponse response = await fetchCategorys();
+      // Make the API call to fetch products by category
+      ApiResponse response = await fetchProductsByCategory(categoryId);
+
       if (response.error == null && mounted) {
         setState(() {
-          category = response.data as List<CategorieModel>;
+          products = response.data as List<ProduitModel>;
         });
       } else if (response.error == 'unauthorized') {
         if (mounted) {
@@ -115,6 +119,36 @@ class _MyHomePageState extends State<MyHomePage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to fetch products')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    }
+  }
+
+  void getCategory() async {
+    try {
+      ApiResponse response = await fetchCategorys();
+      if (response.error == null && mounted) {
+        setState(() {
+          category = response.data as List<CategorieModel>;
+        });
+        print("her is category list: ${category[3].name_category}");
+      } else if (response.error == 'unauthorized') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${response.error}')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to fetch categories')),
           );
         }
       }
@@ -204,7 +238,11 @@ class _MyHomePageState extends State<MyHomePage> {
     _pageController = PageController(initialPage: 0);
     startTimer();
 
-    getProduct();
+    if (selectedCategory != null) {
+      fetchProductsByCategory(selectedCategory!.id_category!); // Pass the selected category's ID to fetchProductsByCategory
+    } else {
+      print("no data found") ; // Fetch all products if no category is selected
+    }
     getCategory();
   }
 
@@ -394,36 +432,74 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
                           ),*/
-
+                      // list of categories
                       SizedBox(
                         height: 50,
-                        child: ListView.builder(
+                        child:
+
+                         ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: category.length,
                           itemBuilder: (context, index) {
                             CategorieModel currentCategory = category[index];
                             return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                width: 100,
-                                height: 100,
-                                color: Colors.blue,
-                                child: Center(
-                                  child: Text(
-                                    currentCategory.name_category!,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                              padding: const EdgeInsets.all(10.0),
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _currentIndex = index;
+                                      getProductByCategory(category[index].id_category!);
+                                      print("her is the id of my category: ${category[index].id_category}");
+                                    });
+                                    _pageController.animateToPage(
+                                      1,
+                                      duration: Duration(milliseconds: 500),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all<Color>(
+                                      _currentIndex == index ? Colors.redAccent : Colors.white,
                                     ),
+                                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                                          (Set<MaterialState> states) {
+                                        if (states.contains(MaterialState.pressed)) return Colors.redAccent;
+                                        return null;
+                                      },
+                                    ),
+                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30.0),
+                                      ),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 24,
+                                        height: 24,
+                                        child: Image.asset(currentCategory.icon!),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        currentCategory.name_category!,
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          color: _currentIndex == index ? Colors.white : Colors.black,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             );
                           },
                         ),
-                      ),
 
+
+                      ),
+                             // list of productes
                       const SizedBox(height: 15,),
                       SizedBox(
                         height: 350,
@@ -432,10 +508,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPageChanged: (int index) {
                             setState(() {
                               _currentIndex = index;
-                            });
+                            } );
                           },
                           children : [
-                            //List for BreakFast
                             ListView.builder(
                               padding: EdgeInsets.only(bottom: 10),
                               itemCount: (products!.length / 3).ceil(),
@@ -451,7 +526,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         : products!.length - startingIndex,
                                         (i) {
                                       int currentIndex = startingIndex + i;
-                                      final product = products[currentIndex];
+                                      final product = products![currentIndex];
                                       return Column(
                                         children: [
                                           GestureDetector(
@@ -465,8 +540,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   ClipRRect(
                                                     borderRadius: BorderRadius.circular(35.0),
                                                     child: Image.asset(
-                                                      product.image!
-                                                      ,
+                                                      product.image!,
                                                       width: 270,
                                                       height: 270,
                                                     ),
@@ -488,24 +562,23 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 );
                               },
-                            ),
-                            // List for Drinks
-                            ListView.builder(
-                              padding: EdgeInsets.only(bottom: 70),
-                              itemCount: (4 / 3).ceil(),
+                            )
+
+                            //List for products
+                           /* ListView.builder(
+                              padding: EdgeInsets.only(bottom: 10),
+                              itemCount: (products!.length / 3).ceil(),
                               itemBuilder: (BuildContext context, int index) {
                                 int startingIndex = index * 3;
-
                                 return GridView.count(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
                                   crossAxisCount: 3,
                                   children: List.generate(
-                                    (startingIndex + 3 <= 4)
-                                        ? 3
-                                        : 4 - startingIndex,
+                                    (startingIndex + 3 <= products!.length) ? 3 : products!.length - startingIndex,
                                         (i) {
                                       int currentIndex = startingIndex + i;
+                                      final product = products[currentIndex];
                                       return Column(
                                         children: [
                                           GestureDetector(
@@ -519,7 +592,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   ClipRRect(
                                                     borderRadius: BorderRadius.circular(35.0),
                                                     child: Image.asset(
-                                                      'Icons/breakfast.png',
+                                                      product.image!,
                                                       width: 270,
                                                       height: 270,
                                                     ),
@@ -529,7 +602,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             ),
                                           ),
                                           Text(
-                                            "tiiitle",
+                                            product.name!,
                                             style: TextStyle(
                                               color: Colors.black54,
                                               fontSize: 20.0,
@@ -541,114 +614,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 );
                               },
-                            ),
-                            //List for Patisserie
-                            ListView.builder(
-                              padding: EdgeInsets.only(bottom: 70),
-                              itemCount: (4 / 3).ceil(),
-                              itemBuilder: (BuildContext context, int index) {
-                                int startingIndex = index * 3;
-
-                                return GridView.count(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  crossAxisCount: 3,
-                                  children: List.generate(
-                                    (startingIndex + 3 <= 4)
-                                        ? 3
-                                        : 4 - startingIndex,
-                                        (i) {
-                                      int currentIndex = startingIndex + i;
-                                      return Column(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () => showMyDialog(context),
-                                            child: Card(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(35.0),
-                                              ),
-                                              child: Stack(
-                                                children: [
-                                                  ClipRRect(
-                                                    borderRadius: BorderRadius.circular(35.0),
-                                                    child: Image.asset(
-                                                      'Icons/breakfast.png',
-                                                      width: 270,
-                                                      height: 270,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            "tiiitle",
-                                            style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 20.0,
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                            //List for viennoiseries & sec
-                            ListView.builder(
-                              padding: EdgeInsets.only(bottom: 70),
-                              itemCount: (4 / 3).ceil(),
-                              itemBuilder: (BuildContext context, int index) {
-                                int startingIndex = index * 3;
-
-                                return GridView.count(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  crossAxisCount: 3,
-                                  children: List.generate(
-                                    (startingIndex + 3 <= 4)
-                                        ? 3
-                                        : 4 - startingIndex,
-                                        (i) {
-                                      int currentIndex = startingIndex + i;
-                                      return Column(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () => showMyDialog(context),
-                                            child: Card(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(35.0),
-                                              ),
-                                              child: Stack(
-                                                children: [
-                                                  ClipRRect(
-                                                    borderRadius: BorderRadius.circular(35.0),
-                                                    child: Image.asset(
-                                                      'Icons/breakfast.png',
-                                                      width: 270,
-                                                      height: 270,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            "tiiitle",
-                                            style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 20.0,
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                            
+                            )
+*/
                           ],
                         ),
                       ),

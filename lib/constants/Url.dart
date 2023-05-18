@@ -1,5 +1,5 @@
 
-const baseURL = 'http://192.168.43.222:8000/api';
+const baseURL = 'http://192.168.1.7:8000/api';
 
 const productURL = baseURL + '/getProducts';
 const categoryURL = baseURL + '/getCategory';

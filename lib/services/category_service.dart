@@ -4,7 +4,6 @@ import 'package:menu/model/apiRespons.dart';
 import 'dart:convert';
 
 import '../constants/Url.dart';
-import '../model/ProduitModel.dart';
 
 Future<ApiResponse> fetchCategorys() async {
   ApiResponse apiResponse = ApiResponse();
@@ -15,7 +14,6 @@ Future<ApiResponse> fetchCategorys() async {
         'Accept': 'application/json',
       },
     );
-
     switch (response.statusCode) {
       case 200:
         List<dynamic> data = jsonDecode(response.body)['categorie'];
