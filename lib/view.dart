@@ -36,6 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _toggleSecondPartVisibility() {
     setState(() {
       _isSecondPartVisible = true;
+
     });
 
   }
@@ -247,7 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late PageController _pageController;
   int _currentIndex = 0;
 
-
+               //initState
 
   void initState() {
     super.initState();
@@ -453,7 +454,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         height: 50,
                         child:
 
-                        ListView.builder(
+                        ListView.builder (
                           scrollDirection: Axis.horizontal,
                           itemCount: category.length,
                           itemBuilder: (context, index) {
@@ -469,8 +470,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                       print("her is the id of my category: ${category[index].id_category}");
                                     });
                                     _pageController.animateToPage(
-                                      1,
-                                      duration: Duration(milliseconds: 500),
+                                      _currentIndex,
+                                      duration: Duration(milliseconds: 10),
                                       curve: Curves.easeInOut,
                                     );
                                   },
@@ -513,28 +514,32 @@ class _MyHomePageState extends State<MyHomePage> {
                           },
                         ),
 
-
                       ),
                       // list of productes
                       const SizedBox(height: 15,),
                       SizedBox(
                         height: 350,
-                        child: PageView(
+                        child: PageView.builder(
+                          physics: ScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
                           controller: _pageController,
                           onPageChanged: (int index) {
                             setState(() {
                               _currentIndex = index;
-                            } );
+                              getProductByCategory(category[index].id_category!);
+                            });
                           },
-                          children : [
-                            ListView.builder(
+                            itemCount: category.length,
+                          itemBuilder: (BuildContext context,int index){
+
+                          return  ListView.builder(
                               padding: EdgeInsets.only(bottom: 10),
                               itemCount: (products!.length / 3).ceil(),
                               itemBuilder: (BuildContext context, int index) {
                                 int startingIndex = index * 3;
                                 return GridView.count(
                                   shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
+                                  physics: ScrollPhysics(),
                                   crossAxisCount: 3,
                                   children: List.generate(
                                     (startingIndex + 3 <= products!.length)
@@ -578,61 +583,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 );
                               },
-                            )
-
-                            //List for products
-                            /* ListView.builder(
-                              padding: EdgeInsets.only(bottom: 10),
-                              itemCount: (products!.length / 3).ceil(),
-                              itemBuilder: (BuildContext context, int index) {
-                                int startingIndex = index * 3;
-                                return GridView.count(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  crossAxisCount: 3,
-                                  children: List.generate(
-                                    (startingIndex + 3 <= products!.length) ? 3 : products!.length - startingIndex,
-                                        (i) {
-                                      int currentIndex = startingIndex + i;
-                                      final product = products[currentIndex];
-                                      return Column(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () => showMyDialog(context),
-                                            child: Card(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(35.0),
-                                              ),
-                                              child: Stack(
-                                                children: [
-                                                  ClipRRect(
-                                                    borderRadius: BorderRadius.circular(35.0),
-                                                    child: Image.asset(
-                                                      product.image!,
-                                                      width: 270,
-                                                      height: 270,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            product.name!,
-                                            style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 20.0,
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                            )
-*/
-                          ],
+                            );
+                          }
                         ),
                       ),
                     ],
@@ -690,7 +642,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       children: [
                                         ListTile(
                                           title: Text(selectedProduct.name!),
-                                          subtitle: Text('Price: \$${selectedProduct.prix!.toStringAsFixed(2)}'),
+                                          subtitle: Text('Prix: \$${selectedProduct.prix!.toStringAsFixed(2)}'),
                                           trailing: IconButton(
                                             icon: Icon(Icons.close),
                                             onPressed: () {
