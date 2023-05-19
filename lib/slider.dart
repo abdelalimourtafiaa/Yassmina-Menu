@@ -52,7 +52,7 @@ class _AutoplayListViewState extends State<AutoplayListView> {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        height: 300,
+        height: 250,
         child: Row(
           children: [
             Expanded(
@@ -104,7 +104,7 @@ class _AutoplayListViewState extends State<AutoplayListView> {
                             height: 7.0,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: _currentIndex == entry.key ? Colors.red : Colors.teal,
+
                             ),
                           ),
                         );
