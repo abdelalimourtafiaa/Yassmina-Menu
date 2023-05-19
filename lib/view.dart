@@ -41,6 +41,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
+  double calculateTotalPrice(List<ProduitModel> products) {
+    double totalPrice = 0;
+    for (var product in products) {
+      totalPrice += product.prix ?? 0;
+    }
+    return totalPrice;
+  }
+
 
   //Product list
   List<ProduitModel> products = [];
@@ -343,8 +351,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
+                     const SizedBox(height: 10,),
 
-                      const SizedBox(height: 15,),
 
                       //Slider of home page
 
@@ -354,8 +362,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         {"id": 3, "image_path": 'Icons/Yasmina1.png'},
                         {"id": 2, "image_path": 'Icons/LogoYassmina.png'}
 
-                      ], itemWidth: double.infinity, itemHeight: 150,),
-                      const SizedBox(height: 12,),
+                      ], itemWidth: double.infinity, itemHeight: 130,),
 
                       //text
                       Container(
@@ -365,7 +372,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             Text(
                               'Select category you would like  ' ,
                               style: TextStyle(color: Colors.black,
-                                  fontSize: 20),
+                                  fontSize: 20,
+                                  fontStyle: FontStyle.italic),
                               textAlign: TextAlign.start,
 
                             ),
@@ -413,7 +421,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       SizedBox(
                         height: 50,
                         child:
-
                         ListView.builder (
                           scrollDirection: Axis.horizontal,
                           itemCount: category.length,
@@ -524,6 +531,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       product.image!,
                                                       width: 270,
                                                       height: 270,
+                                                      fit: BoxFit.cover,
                                                     ),
                                                   ),
                                                 ],
@@ -581,7 +589,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: Text('My Order',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 18,
+                                        fontSize: 24,
                                       ),
                                     ),
                                   ),
@@ -589,9 +597,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               SizedBox(height: 10,),
                               SingleChildScrollView(
+                                physics: ScrollPhysics(), // Enable scrolling
                                 child: ListView.builder(
+                                  physics: ScrollPhysics(),
                                   shrinkWrap: true,
-                                  physics: ScrollPhysics(), // Enable scrolling
                                   itemCount: selectedProducts!.length,
                                   itemBuilder: (context, index) {
                                     if (index >= selectedProducts.length) {
@@ -624,18 +633,22 @@ class _MyHomePageState extends State<MyHomePage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
+                                  SizedBox(width: 10,),
                                   Text('Total :',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                      fontSize: 24,
                                     ),
                                   ),
-                                  Text('Prix:',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
-                                  ),
+                          SizedBox(width: 15,),
+                          Text(
+                           '${calculateTotalPrice(selectedProducts).toStringAsFixed(2)}',
+                             style: TextStyle(
+                             fontWeight: FontWeight.bold,
+                             fontSize: 24,
+                               color: Colors.green,
+                             ),
+                           ),
                                 ],
                               ),
                               SizedBox(height: 25,),
