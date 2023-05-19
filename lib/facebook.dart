@@ -82,7 +82,8 @@ class _WebViewAppState extends State<WebViewAppFacbook> {
               flex: 19,
 
               child: const WebView(
-              initialUrl: 'm.facebook.com/tawjihhoussam/',
+              initialUrl: 'https://www.facebook.com/tawjihhoussam',
+                javascriptMode: JavascriptMode.unrestricted,
           ),
             ),
         ],
