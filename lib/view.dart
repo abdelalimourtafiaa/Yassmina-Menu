@@ -13,6 +13,7 @@ import 'package:menu/model/CategorieModel.dart';
 import 'package:menu/services/category_service.dart';
 import 'package:menu/services/product_services.dart';
 import 'package:menu/slider.dart';
+import 'ExpandeLeft.dart';
 import 'constants/Url.dart';
 import 'facebook.dart';
 import 'model/ProduitModel.dart';
@@ -224,7 +225,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-
           ),
         );
       },
@@ -295,52 +295,14 @@ class _MyHomePageState extends State<MyHomePage> {
     timer = null;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    List<String> items = ['Item 1','Item 2','Item 3'];
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: Row(
           children: [
-            Expanded(
-              flex: 1,
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Color(0xFFfa7777),
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(35),bottomRight: Radius.circular(35))
-                ),
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.home,size: 35,color: Colors.white,), onPressed: () { Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) =>  MyHomePage()),
-                        ); },
-                        ),
-                        SizedBox(height: 50,),
-                        IconButton(
-                          icon: Icon(Icons.facebook,size: 35,color: Colors.white,), onPressed: () {
-                          Navigator.push(
-                            context,MaterialPageRoute(builder: (context) => WebViewAppFacbook()),
-                          ); },
-                        ),
-                        SizedBox(height: 50,),
-                        IconButton(
-                          icon: Image.asset('Icons/instagram.png',color: Colors.white,width: 35,height: 35,), onPressed: () { Navigator.push(
-                          context,MaterialPageRoute(builder: (context) => WebViewAppInstagram()),
-                        ); },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            ExpandedLeft(),
             Expanded(
               flex: 19,
               child: Container(
