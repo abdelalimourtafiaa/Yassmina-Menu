@@ -35,8 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _toggleSecondPartVisibility() {
     setState(() {
-      _isSecondPartVisible = true;
-
+      _isSecondPartVisible = selectedProducts.isNotEmpty;
     });
 
   }
@@ -203,7 +202,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: TextStyle(
                           fontSize: 25,
                             color: Colors.black54),
-
                       ),
                     ),
                     TextButton(
@@ -595,7 +593,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
             Visibility(
-              visible: _isSecondPartVisible,
+              visible: selectedProducts.isNotEmpty,
               child: Expanded(
                 flex: 5,
                 child: Container(
