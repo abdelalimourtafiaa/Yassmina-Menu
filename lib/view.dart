@@ -368,7 +368,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         {"id": 3, "image_path": 'Icons/Yasmina1.png'},
                         {"id": 2, "image_path": 'Icons/LogoYassmina.png'}
 
-                      ], itemWidth: double.infinity, itemHeight: 130,),
+                      ], itemWidth: 450, itemHeight: 130,),
 
                       //text
                       Container(

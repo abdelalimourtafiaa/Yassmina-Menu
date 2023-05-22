@@ -52,7 +52,7 @@ class _AutoplayListViewState extends State<AutoplayListView> {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        height: 250,
+        height: 200,
         child: Row(
           children: [
             Expanded(
@@ -80,35 +80,14 @@ class _AutoplayListViewState extends State<AutoplayListView> {
                     options: CarouselOptions(
                       enableInfiniteScroll: true,
                       autoPlay: false,
-                      viewportFraction: 0.4,
-                      aspectRatio: 5,
+                      viewportFraction: 0.47,
+                      aspectRatio: 6.5,
                       initialPage: _currentIndex,
                       onPageChanged: (index, _) {
                         setState(() {
                           _currentIndex = index;
                         });
                       },
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: widget.imageList.asMap().entries.map((entry) {
-                        return GestureDetector(
-                          onTap: () => _controller.animateToPage(entry.key),
-                          child: Container(
-                            width: _currentIndex == entry.key ? 17 : 7,
-                            height: 7.0,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-
-                            ),
-                          ),
-                        );
-                      }).toList(),
                     ),
                   ),
                 ],
