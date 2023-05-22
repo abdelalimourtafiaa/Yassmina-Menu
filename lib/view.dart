@@ -10,9 +10,12 @@ import 'package:menu/CallApi.dart';
 import 'package:menu/SplashScreen.dart';
 import 'package:menu/instagram.dart';
 import 'package:menu/model/CategorieModel.dart';
+import 'package:menu/model/OrderModel.dart';
+import 'package:menu/services/OrderService.dart';
 import 'package:menu/services/category_service.dart';
 import 'package:menu/services/product_services.dart';
 import 'package:menu/slider.dart';
+import 'package:provider/provider.dart';
 import 'ExpandeLeft.dart';
 import 'constants/Url.dart';
 import 'facebook.dart';
@@ -152,6 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final _orderVM=Provider.of<OrderService>(context);
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(35.0),
@@ -217,6 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onPressed: () {
                         setState(() {
                           selectedProducts.add(product);
+                          _orderVM.handlesaveproduct(produitModel: product);
                         });
                         Navigator.pop(context);
 
@@ -262,9 +267,9 @@ class _MyHomePageState extends State<MyHomePage> {
     startTimer();
 
     if (selectedCategory != null) {
-      fetchProductsByCategory(selectedCategory!.id_category!); // Pass the selected category's ID to fetchProductsByCategory
+      fetchProductsByCategory(selectedCategory!.id!); // Pass the selected category's ID to fetchProductsByCategory
     } else {
-      print("no data found") ; // Fetch all products if no category is selected
+
     }
     getCategory();
   }
@@ -305,6 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final offreVM=Provider.of<OrderService>(context);
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: SafeArea(
@@ -433,8 +439,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   onPressed: () {
                                     setState(() {
                                       _currentIndex = index;
-                                      getProductByCategory(category[index].id_category!);
-                                      print("her is the id of my category: ${category[index].id_category}");
+                                      getProductByCategory(category[index].id!);
+                                      print("her is the id of my category: ${category[index].id}");
                                     });
                                     _pageController.animateToPage(
                                       _currentIndex,
@@ -493,14 +499,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPageChanged: (int index) {
                             setState(() {
                               _currentIndex = index;
-                              getProductByCategory(category[index].id_category!);
+                              getProductByCategory(category[index].id!);
                             });
                           },
                             itemCount: category.length,
                           itemBuilder: (BuildContext context,int index){
 
                           return  ListView.builder(
-                              padding: EdgeInsets.only(bottom: 10),
+                              padding: EdgeInsets.only(bottom: 25),
                               itemCount: (products!.length / 3).ceil(),
                               itemBuilder: (BuildContext context, int index) {
                                 int startingIndex = index * 3;
@@ -518,7 +524,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                       return Column(
                                         children: [
                                           GestureDetector(
-                                            onTap: () => showMyDialog(context,product),
+                                            onTap: (){
+                                              print("her is the  product : ${product.id}");
+                                              showMyDialog(context,product);
+
+                                            },
                                             child: Card(
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(35.0),
@@ -653,7 +663,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               SizedBox(height: 25,),
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  offreVM.sendProduct();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('order has send '),
+                                    ),
+                                  );
+
+                                },
                                 style: ButtonStyle(
                                   backgroundColor: MaterialStateProperty.all<Color>(Colors.redAccent),
                                   overlayColor: MaterialStateProperty.resolveWith<Color?>(
@@ -676,8 +694,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 ),
                               ),
-
-
                             ],
                           ),
                         ),

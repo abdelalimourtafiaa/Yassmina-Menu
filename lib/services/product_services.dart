@@ -49,7 +49,7 @@ Future<ApiResponse> fetchProductsByCategory(int categoryId) async {
     print("her is the uri: $productURL/$categoryId");
     switch (response.statusCode) {
       case 200:
-        List<dynamic> data = jsonDecode(response.body)['produit'];
+        List<dynamic> data = jsonDecode(response.body)['products'];
         List<ProduitModel> produit = data.map((e) => ProduitModel.fromJson(e)).toList();
         apiResponse.data = produit;
         break;
