@@ -52,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return totalPrice;
   }
 
+  String _searchQuery = '';
 
   //Product list
   List<ProduitModel> products = [];
@@ -60,44 +61,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   CategorieModel? selectedCategory;
 
-// Product list
-  /*void getProduct() async {
-    try {
-      ApiResponse response = await fetchProducts();
-      if (response.error == null && mounted) {
-        setState(() {
-          products = response.data as List<ProduitModel>;
-        });
-      } else if (response.error == 'unauthorized') {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${response.error}')),
-          );
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to fetch products')),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An error occurred: $e')),
-        );
-      }
-    }
-  }*/
+
   void getProductByCategory(int categoryId) async {
     try {
       // Make the API call to fetch products by category
       ApiResponse response = await fetchProductsByCategory(categoryId);
 
       if (response.error == null && mounted) {
+        List<ProduitModel> fetchedProducts = response.data as List<ProduitModel>;
+
+        // Filter products based on search query
+        if (_searchQuery.isNotEmpty) {
+          fetchedProducts = fetchedProducts.where((product) =>
+              product.name!.toLowerCase().contains(_searchQuery.toLowerCase())
+          ).toList();
+        }
+
         setState(() {
-          products = response.data as List<ProduitModel>;
+          products = fetchedProducts;
         });
+
       } else if (response.error == 'unauthorized') {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -119,6 +102,15 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
+  void searchProducts(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (selectedCategory != null) {
+        getProductByCategory(selectedCategory!.id!);
+      }
+    });
+  }
+
 
   void getCategory() async {
     try {
@@ -148,6 +140,14 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       }
     }
+  }
+
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+    startTimer();
+
+    getCategory();
   }
 
 
@@ -261,18 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                //initState
 
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 0);
-    startTimer();
 
-    if (selectedCategory != null) {
-      fetchProductsByCategory(selectedCategory!.id!); // Pass the selected category's ID to fetchProductsByCategory
-    } else {
-
-    }
-    getCategory();
-  }
 
 
 
@@ -341,6 +330,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
                         child: TextField(
                           controller: _searchQueryController,
+                          onChanged: (value) {
+                            searchProducts(value); // Call the searchProducts function with the updated search query
+                          },
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.grey.shade400),
@@ -486,7 +478,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             );
                           },
                         ),
-
                       ),
                       // list of productes
                       const SizedBox(height: 15,),
@@ -505,7 +496,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             itemCount: category.length,
                           itemBuilder: (BuildContext context,int index){
 
-                          return  ListView.builder(
+                          return  ListView.builder (
                               padding: EdgeInsets.only(bottom: 25),
                               itemCount: (products!.length / 3).ceil(),
                               itemBuilder: (BuildContext context, int index) {
