@@ -16,16 +16,17 @@ class OrderService extends ChangeNotifier{
   List<OrderModel> productList = [];
    handlesaveproduct({required ProduitModel produitModel}) {
      print("her is the  product : ${produitModel.prix}");
+     productList.clear();
     image=produitModel.image!;
     name=produitModel.name!;
     prix=produitModel.prix!;
      final orderModel=OrderModel( image: image, name: name, prix: prix);
      productList.add(orderModel);
+     log( productList.toString());
 
    }
 
   Future<void>sendProduct()async {
-
      try {
       final response = await http.post(
         Uri.parse(orderURL),
@@ -33,12 +34,14 @@ class OrderService extends ChangeNotifier{
           'Content-Type': 'application/json',
         },
         body: jsonEncode(productList),
+
       );
 
       log(response.statusCode.toString());
       if (response.statusCode == 200) {
         // Request successful, handle the response
         log('Data sent successfully');
+
       } else {
         // Request failed, handle the error
         log('Failed to send data');

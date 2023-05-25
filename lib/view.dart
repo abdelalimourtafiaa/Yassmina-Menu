@@ -21,6 +21,7 @@ import 'constants/Url.dart';
 import 'facebook.dart';
 import 'model/ProduitModel.dart';
 import 'model/apiRespons.dart';
+import 'overlaid.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -76,7 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
               product.name!.toLowerCase().contains(_searchQuery.toLowerCase())
           ).toList();
         }
-
         setState(() {
           products = fetchedProducts;
         });
@@ -102,6 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
+
+
   void searchProducts(String query) {
     setState(() {
       _searchQuery = query;
@@ -110,6 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
+
 
 
   void getCategory() async {
@@ -142,13 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 0);
-    startTimer();
 
-    getCategory();
-  }
 
 
   void showMyDialog(BuildContext context, ProduitModel product) {
@@ -169,15 +166,19 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Row(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: Image.asset(
-                        product.image!,
-                        width: 300,
-                        height: 300,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                 ClipRRect(
+                 borderRadius: BorderRadius.circular(35.0),
+                 child: Container(
+                 width:300,
+                 height:300,
+                 decoration: BoxDecoration(
+                 image: DecorationImage(
+                  image: NetworkImage('${product.image!}'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
                         SizedBox(width: 25,),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -224,7 +225,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           _orderVM.handlesaveproduct(produitModel: product);
                         });
                         Navigator.pop(context);
-
                         _toggleSecondPartVisibility();
                         // Do something when the button is pressed
                       },
@@ -260,10 +260,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
 
                //initState
-
-
-
-
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+    startTimer();
+    getCategory();
+  }
 
   @override
   void dispose() {
@@ -528,11 +530,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 children: [
                                                   ClipRRect(
                                                     borderRadius: BorderRadius.circular(35.0),
-                                                    child: Image.asset(
-                                                      product.image!,
-                                                      width: 270,
-                                                      height: 270,
-                                                      fit: BoxFit.cover,
+                                                    child: Container(
+                                                      width:270,
+                                                      height:270,
+                                                      decoration: BoxDecoration(
+                                                        image: DecorationImage(
+                                                          image: NetworkImage('${product.image!}'),
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -566,7 +572,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Visibility(
               visible: selectedProducts.isNotEmpty,
               child: Expanded(
-                flex: 5,
+                flex: 6,
                 child: Container(
                   color: Colors.white,
                   child: Stack(
@@ -611,6 +617,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     return Column(
                                       children: [
                                         ListTile(
+                                          leading: Image.network('${selectedProduct.image!}'),
                                           title: Text(selectedProduct.name!),
                                           subtitle: Text('Prix: \$${selectedProduct.prix!.toStringAsFixed(2)}'),
                                           trailing: IconButton(
@@ -643,10 +650,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                           SizedBox(width: 15,),
                           Text(
-                           '${calculateTotalPrice(selectedProducts).toStringAsFixed(2)}',
+                           '${calculateTotalPrice(selectedProducts).toStringAsFixed(2)}'+' DH',
                              style: TextStyle(
                              fontWeight: FontWeight.bold,
-                             fontSize: 24,
+                             fontSize: 22,
                                color: Colors.green,
                              ),
                            ),
@@ -656,11 +663,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ElevatedButton(
                                 onPressed: () {
                                   offreVM.sendProduct();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('order has send '),
-                                    ),
-                                  );
+                                  SuccessMessageOverlay.show(context);
 
                                 },
                                 style: ButtonStyle(
