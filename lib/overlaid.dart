@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class SuccessMessageOverlay {
   static show(BuildContext context) {
-    OverlayState overlayState = Overlay.of(context);
+    OverlayState? overlayState = Overlay.of(context);
     OverlayEntry overlayEntry;
 
     overlayEntry = OverlayEntry(
@@ -39,7 +39,7 @@ class SuccessMessageOverlay {
       ),
     );
 
-    overlayState.insert(overlayEntry);
+    overlayState?.insert(overlayEntry);
 
     Future.delayed(Duration(seconds: 2), () {
       overlayEntry.remove();

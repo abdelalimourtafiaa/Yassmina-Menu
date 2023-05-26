@@ -623,7 +623,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   itemCount: selectedProducts!.length,
                                   itemBuilder: (context, index) {
                                     if (index >= selectedProducts.length) {
-                                      return null; // Return null for invalid indices
+                                      return Container(); // Return null for invalid indices
                                     }
                                     final selectedProduct = selectedProducts[index];
                                     return Column(
