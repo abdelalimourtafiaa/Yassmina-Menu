@@ -228,12 +228,24 @@ class _MyHomePageState extends State<MyHomePage> {
                         _toggleSecondPartVisibility();
                         // Do something when the button is pressed
                       },
-                      child: Text(
-                        'Enregestrer le choix',
-                        style: TextStyle(color: Colors.green,
-                        fontSize: 25),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
+                        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                        textStyle: MaterialStateProperty.all<TextStyle>(
+                          TextStyle(fontSize: 25),
+                        ),
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        ),
+                        shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                       ),
-                    ),
+                      child: Text('Enregistrer le choix'),
+                    )
+
                   ],
                 ),
               ],
@@ -370,7 +382,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Row(
                           children: [
                             Text(
-                              'Select category you would like  ' ,
+                              'Sélectionnez la catégorie que vous souhaitez ' ,
                               style: TextStyle(color: Colors.black,
                                   fontSize: 20,
                                   fontStyle: FontStyle.italic),
@@ -611,7 +623,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   itemCount: selectedProducts!.length,
                                   itemBuilder: (context, index) {
                                     if (index >= selectedProducts.length) {
-                                      return null; // Return null for invalid indices
+                                      return Container(); // Return null for invalid indices
                                     }
                                     final selectedProduct = selectedProducts[index];
                                     return Column(

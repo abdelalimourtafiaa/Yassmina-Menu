@@ -11,18 +11,26 @@ class OrderService extends ChangeNotifier{
   String? image;
   String? name;
   double? prix;
+  String? number;
+
+
 
 
   List<OrderModel> productList = [];
    handlesaveproduct({required ProduitModel produitModel}) {
      print("her is the  product : ${produitModel.prix}");
-     productList.clear();
+    // productList.clear();
     image=produitModel.image!;
     name=produitModel.name!;
     prix=produitModel.prix!;
      final orderModel=OrderModel( image: image, name: name, prix: prix);
      productList.add(orderModel);
      log( productList.toString());
+
+   }
+   handleSaveTableNumber({required String tableNumber}){
+     number =tableNumber;
+    // log(number.toString());
 
    }
 
@@ -41,7 +49,7 @@ class OrderService extends ChangeNotifier{
       if (response.statusCode == 200) {
         // Request successful, handle the response
         log('Data sent successfully');
-
+        productList.clear();
       } else {
         // Request failed, handle the error
         log('Failed to send data');
@@ -51,6 +59,7 @@ class OrderService extends ChangeNotifier{
       log('Error: $error');
     }
   }
+
 
 }
 
