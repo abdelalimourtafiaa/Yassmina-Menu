@@ -1,8 +1,6 @@
 
 import 'dart:core';
 
-
-
 import 'package:flutter/material.dart';
 import 'package:menu/SplashScreen.dart';
 import 'package:menu/services/OrderService.dart';

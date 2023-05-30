@@ -80,7 +80,7 @@ class _AutoplayListViewState extends State<AutoplayListView> {
                     options: CarouselOptions(
                       enableInfiniteScroll: true,
                       autoPlay: false,
-                      viewportFraction: 0.47,
+                      viewportFraction: 0.3,
                       aspectRatio: 6.5,
                       initialPage: _currentIndex,
                       onPageChanged: (index, _) {
