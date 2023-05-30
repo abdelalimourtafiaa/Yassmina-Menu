@@ -6,7 +6,7 @@ import 'dart:core';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:menu/CallApi.dart';
+import 'package:menu/call%20api/CallApi.dart';
 import 'package:menu/SplashScreen.dart';
 import 'package:menu/instagram.dart';
 import 'package:menu/model/CategorieModel.dart';
@@ -21,7 +21,7 @@ import 'constants/Url.dart';
 import 'facebook.dart';
 import 'model/ProduitModel.dart';
 import 'model/apiRespons.dart';
-import 'overlaid.dart';
+import 'SuccessMessage.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -152,73 +152,78 @@ class _MyHomePageState extends State<MyHomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final _orderVM=Provider.of<OrderService>(context);
+        final _orderVM = Provider.of<OrderService>(context);
         return Dialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(35.0),
+            borderRadius: BorderRadius.circular(16.0),
           ),
           child: Container(
-            padding: EdgeInsets.all(6),
-            width: 700,
-            height: 700,
+            width: 800,
+            padding: EdgeInsets.all(24),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                 ClipRRect(
-                 borderRadius: BorderRadius.circular(35.0),
-                 child: Container(
-                 width:300,
-                 height:300,
-                 decoration: BoxDecoration(
-                 image: DecorationImage(
-                  image: NetworkImage('${product.image!}'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-                        SizedBox(width: 25,),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                        children : [
-                        Text(
-                          product.name!,
-                          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                    Container(
+                      width: 300,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                        image: DecorationImage(
+                          image: NetworkImage('${product.image!}'),
+                          fit: BoxFit.cover,
                         ),
-                        SizedBox(height: 16),
-                        SizedBox(
-                          height: 200,
-                          width: 350,
-                          child: Text(
-                            product.description!,
-                            style: TextStyle(fontSize: 22),
+                      ),
+                    ),
+                    SizedBox(width: 24),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.name!,
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Price: \$${product.prix!.toStringAsFixed(2)}',
-                          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                        ),
+                          SizedBox(height: 12),
+                          Text(
+                            product.description!,
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            'Prix: \$${product.prix!.toStringAsFixed(2)} DH',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
-                        ),
+                      ),
+                    ),
                   ],
                 ),
-                SizedBox(height: 40,),
+                SizedBox(height: 32),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        'CANCEL',
+                        'Annuler',
                         style: TextStyle(
-                          fontSize: 25,
-                            color: Colors.black54),
+                          fontSize: 20,
+                          color: Colors.black54,
+                        ),
                       ),
                     ),
-                    TextButton(
+                    SizedBox(width: 24),
+                    ElevatedButton(
                       onPressed: () {
                         setState(() {
                           selectedProducts.add(product);
@@ -228,24 +233,17 @@ class _MyHomePageState extends State<MyHomePage> {
                         _toggleSecondPartVisibility();
                         // Do something when the button is pressed
                       },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
-                        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                        textStyle: MaterialStateProperty.all<TextStyle>(
-                          TextStyle(fontSize: 25),
-                        ),
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                        ),
-                        shape: MaterialStateProperty.all<OutlinedBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.green,
+                        onPrimary: Colors.white,
+                        textStyle: TextStyle(fontSize: 20),
+                        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       child: Text('Enregistrer le choix'),
-                    )
-
+                    ),
                   ],
                 ),
               ],
@@ -473,9 +471,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Row(
                                     children: [
                                       Container(
-                                        width: 24,
-                                        height: 24,
-                                        child: Image.asset(currentCategory.icon!),
+                                        width:24,
+                                        height:24,
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage('${currentCategory.icon!}'),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                       ),
                                       SizedBox(width: 10),
                                       Text(
@@ -560,7 +563,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           Text(
                                             product.name!,
                                             style: TextStyle(
-                                              color: Colors.black54,
+                                              color: Colors.black,
                                               fontSize: 20.0,
                                             ),
                                           ),
@@ -628,19 +631,35 @@ class _MyHomePageState extends State<MyHomePage> {
                                     final selectedProduct = selectedProducts[index];
                                     return Column(
                                       children: [
-                                        ListTile(
-                                          leading: Image.network('${selectedProduct.image!}'),
-                                          title: Text(selectedProduct.name!),
-                                          subtitle: Text('Prix: \$${selectedProduct.prix!.toStringAsFixed(2)}'),
-                                          trailing: IconButton(
-                                            icon: Icon(Icons.close),
-                                            onPressed: () {
-                                              setState(() {
-                                                selectedProducts.removeAt(index);
-                                              });
-                                            },
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                          child: Container(
+                                    decoration: BoxDecoration(
+                                    color: Colors.grey.shade200, ),
+                                            child: ListTile(
+                                              leading: ClipRRect(
+                                                borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                child: Container(
+                                                  height: 60,
+                                                  width: 60,
+                                                  child: Image.network('${selectedProduct.image!}'),
+                                                ),
+                                              ),
+                                              title: Text(selectedProduct.name!),
+                                              subtitle: Text('Prix: \$${selectedProduct.prix!.toStringAsFixed(2)}'),
+                                              trailing: IconButton(
+                                                icon: Icon(Icons.close),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    selectedProducts.removeAt(index);
+                                                  });
+                                                },
+                                              ),
+                                            ),
                                           ),
                                         ),
+                                        SizedBox(height: 3,),
+
                                       ],
                                     );
                                   },

@@ -7,10 +7,10 @@ class SuccessMessageOverlay {
 
     overlayEntry = OverlayEntry(
       builder: (context) => Positioned.fill(
-        top: 45,
+        top: 5,
         bottom: 10,
-        left: 10,
-        right: 10,
+        left: 50,
+        right: 50,
         child: Material(
           color: Colors.transparent,
           child: Container(
