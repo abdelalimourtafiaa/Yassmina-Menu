@@ -1,23 +1,23 @@
 class TableModel {
   String? name;
-  int? id;
+  int? id_table;
 
   TableModel({
 
     required this.name,
-    required this.id});
+    required this.id_table});
 
   factory TableModel.fromJson(Map<String, dynamic> json) {
     return TableModel(
       name: json['name'] ,
-      id: json['id'] ,
+      id_table: json['id_table'] ,
     );
   }
   // Method to convert ProduitModel object to JSON
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'id': id,
+      'id_table': id_table,
     };
   }
 
