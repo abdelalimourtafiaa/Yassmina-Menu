@@ -26,7 +26,30 @@ class OrderService extends ChangeNotifier {
     final orderModel = OrderModel(
         image: image, name: name, prix: prix, name_table: this.name_table);
     productList.add(orderModel);
+    print('her is the orders : '+productList.toString());
   }
+
+  void handleremoveproduct({
+    required ProduitModel produitModel,
+    required String? name_table,
+  }) {
+    final orderModel = OrderModel(
+      image: produitModel.image!,
+      name: produitModel.name!,
+      prix: produitModel.prix!,
+      name_table: name_table,
+    );
+
+    productList.removeWhere((order) =>
+    order.image == orderModel.image &&
+        order.name == orderModel.name &&
+        order.prix == orderModel.prix &&
+        order.name_table == orderModel.name_table);
+
+    print('Here is the order after deleted: ' + productList.toString());
+  }
+
+
 
   Future<void> sendProduct() async {
     try {

@@ -111,11 +111,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void searchProducts(String query) {
     setState(() {
       _searchQuery = query;
-      if (selectedCategory != null) {
-        getProductByCategory(selectedCategory!.id!);
-      }
+
     });
+
+    getProductByCategory(selectedCategory!.id!);
+    
   }
+
 
 
 
@@ -126,6 +128,8 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           category = response.data as List<CategorieModel>;
         });
+        getProductByCategory(category[0].id!);
+
         print("her is category list: ${category[3].name_category}");
       } else if (response.error == 'unauthorized') {
         if (mounted) {
@@ -156,6 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           table = response.data as List<TableModel>;
           dropdownValues = table.map((item) => item.name).toList();
+          selectedValue = table[0].name;
 
         });
         print("Here is the table list: ${table[1].id_table}");
@@ -231,7 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           SizedBox(height: 12),
                           Text(
-                            'Prix: \$${product.prix!.toStringAsFixed(2)} DH',
+                            'Prix: ${product.prix!.toStringAsFixed(2)} DH',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -310,6 +315,7 @@ class _MyHomePageState extends State<MyHomePage> {
     startTimer();
     getCategory();
     getTable();
+
   }
 
   @override
@@ -351,6 +357,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final offreVM=Provider.of<OrderService>(context);
+    final _orderVM = Provider.of<OrderService>(context);
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: SafeArea(
@@ -370,9 +378,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
                       Center(
                         child: Container(
-                          padding: EdgeInsets.only(top: 12,left: 40),
+                          padding: EdgeInsets.only(left: 40),
                           constraints: BoxConstraints(
-                            minHeight: 10.0,
+                            minHeight: 30.0,
                             minWidth: 500.0,
                             maxHeight: 50.0,
                             maxWidth: 900.0,
@@ -383,7 +391,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: TextField(
                             controller: _searchQueryController,
                             onChanged: (value) {
-                              searchProducts(value); // Call the searchProducts function with the updated search query
+                              searchProducts(value);
+                              getProductByCategory(selectedCategory!.id!);
+
                             },
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
@@ -403,24 +413,34 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                      const SizedBox(height: 10,),
+                      //table name
                       Container(
-                        child:DropdownButton<String?>(
-                          value: selectedValue,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedValue = newValue;
-                            });
-                          },
-                          items: dropdownValues.map((String? value) {
-                            return DropdownMenuItem<String?>(
-                              value: value,
-                              child: Text(value.toString()),
-                            );
-                          }).toList(),
-                          hint: Text('Select a table'),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String?>(
+                            value: selectedValue,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedValue = newValue;
+                              });
+                            },
+                            icon: Opacity(
+                              opacity: 0.0, // Set the opacity to 0 for complete transparency
+                              child: Icon(Icons.arrow_drop_down), // Replace with your desired icon
+                            ),
+                            items: dropdownValues.map((String? value) {
+                              return DropdownMenuItem<String?>(
+                                value: value,
+                                child: Text(
+                                  value.toString(),
+                                  style: TextStyle(
+                                    color: value == selectedValue ? Colors.transparent : Colors.black,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ),
-
 
                       //Slider of home page
 
@@ -671,12 +691,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 ),
                                               ),
                                               title: Text(selectedProduct.name!),
-                                              subtitle: Text('Prix: \$${selectedProduct.prix!.toStringAsFixed(2)}'),
+                                              subtitle: Text('Prix: ${selectedProduct.prix!.toStringAsFixed(2)} DH'),
                                               trailing: IconButton(
                                                 icon: Icon(Icons.close),
                                                 onPressed: () {
                                                   setState(() {
                                                     selectedProducts.removeAt(index);
+                                                    _orderVM.handleremoveproduct(produitModel: selectedProduct, name_table: selectedValue);
                                                   });
                                                 },
                                               ),
