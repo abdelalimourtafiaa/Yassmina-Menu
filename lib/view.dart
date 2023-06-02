@@ -65,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String?> dropdownValues = [];
 
   CategorieModel? selectedCategory;
+  Timer? _searchQueryTimer;
 
 
   void getProductByCategory(int categoryId) async {
@@ -111,11 +112,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void searchProducts(String query) {
     setState(() {
       _searchQuery = query;
-
+      if (_searchQuery.isNotEmpty && selectedCategory != null) {
+        getProductByCategory(selectedCategory!.id!);
+      }
     });
-
-    getProductByCategory(selectedCategory!.id!);
-    
   }
 
 
@@ -129,6 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
           category = response.data as List<CategorieModel>;
         });
         getProductByCategory(category[0].id!);
+
 
         print("her is category list: ${category[3].name_category}");
       } else if (response.error == 'unauthorized') {
@@ -391,8 +392,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: TextField(
                             controller: _searchQueryController,
                             onChanged: (value) {
-                              searchProducts(value);
-                              getProductByCategory(selectedCategory!.id!);
+                                searchProducts(value);
 
                             },
                             decoration: InputDecoration(
