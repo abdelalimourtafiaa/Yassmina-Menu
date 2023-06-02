@@ -1,51 +1,84 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/cupertino.dart';
 import '../constants/Url.dart';
 import '../model/OrderModel.dart';
 import '../model/ProduitModel.dart';
 
 OrderModel? orderModel;
-class OrderService extends ChangeNotifier{
+
+class OrderService extends ChangeNotifier {
   String? image;
   String? name;
   double? prix;
-  String? number;
-
-
-
+  String? name_table;
 
   List<OrderModel> productList = [];
-   handlesaveproduct({required ProduitModel produitModel}) {
-     print("her is the  product : ${produitModel.prix}");
-    // productList.clear();
-    image=produitModel.image!;
-    name=produitModel.name!;
-    prix=produitModel.prix!;
-     final orderModel=OrderModel( image: image, name: name, prix: prix);
-     productList.add(orderModel);
-     log( productList.toString());
 
-   }
-   handleSaveTableNumber({required String tableNumber}){
-     number =tableNumber;
-    // log(number.toString());
+  void handlesaveproduct(
+      {required ProduitModel produitModel, required String? name_table}) {
+    image = produitModel.image!;
+    name = produitModel.name!;
+    prix = produitModel.prix!;
+    this.name_table = name_table;
+    final orderModel = OrderModel(
+        image: image, name: name, prix: prix, name_table: this.name_table);
+    productList.add(orderModel);
+    print('her is the orders : '+productList.toString());
+  }
 
-   }
+  void handleremoveproduct({
+    required ProduitModel produitModel,
+    required String? name_table,
+  }) {
+    final orderModel = OrderModel(
+      image: produitModel.image!,
+      name: produitModel.name!,
+      prix: produitModel.prix!,
+      name_table: name_table,
+    );
 
-  Future<void>sendProduct()async {
-     try {
+    productList.removeWhere((order) =>
+    order.image == orderModel.image &&
+        order.name == orderModel.name &&
+        order.prix == orderModel.prix &&
+        order.name_table == orderModel.name_table);
+
+    print('Here is the order after deleted: ' + productList.toString());
+  }
+
+
+
+  Future<void> sendProduct() async {
+    try {
+      final List<Map<String, dynamic>> orders = productList.map((order) {
+        return {
+          'name_table': order.name_table,
+          'image': order.image,
+          'name': order.name,
+          'prix': order.prix,
+        };
+      }).toList();
+
+      final requestData = {'name_table': name_table, 'orders': productList};
+      final encodedData = jsonEncode(requestData);
+
+      print('Data sent to DB: $encodedData');
+
       final response = await http.post(
         Uri.parse(orderURL),
         headers: <String, String>{
           'Content-Type': 'application/json',
         },
-        body: jsonEncode(productList),
-
+        body: encodedData,
       );
 
-      log(response.statusCode.toString());
+      print(response.body);
+      print('response.body');
+      print('the name :'+ encodedData);
+
       if (response.statusCode == 200) {
         // Request successful, handle the response
         log('Data sent successfully');
@@ -59,7 +92,4 @@ class OrderService extends ChangeNotifier{
       log('Error: $error');
     }
   }
-
-
 }
-

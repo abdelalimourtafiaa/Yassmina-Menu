@@ -11,7 +11,9 @@ import 'package:menu/SplashScreen.dart';
 import 'package:menu/instagram.dart';
 import 'package:menu/model/CategorieModel.dart';
 import 'package:menu/model/OrderModel.dart';
+import 'package:menu/model/TableModel.dart';
 import 'package:menu/services/OrderService.dart';
+import 'package:menu/services/TableController.dart';
 import 'package:menu/services/category_service.dart';
 import 'package:menu/services/product_services.dart';
 import 'package:menu/slider.dart';
@@ -59,8 +61,11 @@ class _MyHomePageState extends State<MyHomePage> {
   List<ProduitModel> products = [];
   List<CategorieModel> category = [];
   List<ProduitModel> selectedProducts = [];
+  List<TableModel> table = [];
+  List<String?> dropdownValues = [];
 
   CategorieModel? selectedCategory;
+  Timer? _searchQueryTimer;
 
 
   void getProductByCategory(int categoryId) async {
@@ -107,11 +112,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void searchProducts(String query) {
     setState(() {
       _searchQuery = query;
-      if (selectedCategory != null) {
+      if (_searchQuery.isNotEmpty && selectedCategory != null) {
         getProductByCategory(selectedCategory!.id!);
       }
     });
   }
+
 
 
 
@@ -122,6 +128,9 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           category = response.data as List<CategorieModel>;
         });
+        getProductByCategory(category[0].id!);
+
+
         print("her is category list: ${category[3].name_category}");
       } else if (response.error == 'unauthorized') {
         if (mounted) {
@@ -145,7 +154,38 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void getTable() async {
+    try {
+      ApiResponse response = await fetchTable();
+      if (response.error == null && mounted) {
+        setState(() {
+          table = response.data as List<TableModel>;
+          dropdownValues = table.map((item) => item.name).toList();
+          selectedValue = table[0].name;
 
+        });
+        print("Here is the table list: ${table[1].id_table}");
+      } else if (response.error == 'unauthorized') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${response.error}')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to fetch table')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    }
+  }
 
 
   void showMyDialog(BuildContext context, ProduitModel product) {
@@ -197,7 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           SizedBox(height: 12),
                           Text(
-                            'Prix: \$${product.prix!.toStringAsFixed(2)} DH',
+                            'Prix: ${product.prix!.toStringAsFixed(2)} DH',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -227,7 +267,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onPressed: () {
                         setState(() {
                           selectedProducts.add(product);
-                          _orderVM.handlesaveproduct(produitModel: product);
+                          _orderVM.handlesaveproduct(produitModel: product,name_table: selectedValue);
                         });
                         Navigator.pop(context);
                         _toggleSecondPartVisibility();
@@ -275,6 +315,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _pageController = PageController(initialPage: 0);
     startTimer();
     getCategory();
+    getTable();
+
   }
 
   @override
@@ -309,9 +351,15 @@ class _MyHomePageState extends State<MyHomePage> {
     timer = null;
   }
 
+
+  String? selectedValue;
+
+
   @override
   Widget build(BuildContext context) {
     final offreVM=Provider.of<OrderService>(context);
+    final _orderVM = Provider.of<OrderService>(context);
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: SafeArea(
@@ -329,40 +377,70 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       const SizedBox(height: 15,),
 
-                      Container(
-                        padding: EdgeInsets.only(top: 12,left: 40),
-                        constraints: BoxConstraints(
-                          minHeight: 10.0,
-                          minWidth: 200.0,
-                          maxHeight: 50.0,
-                          maxWidth: 400.0,
-                        ),
+                      Center(
+                        child: Container(
+                          padding: EdgeInsets.only(left: 40),
+                          constraints: BoxConstraints(
+                            minHeight: 30.0,
+                            minWidth: 500.0,
+                            maxHeight: 50.0,
+                            maxWidth: 900.0,
+                          ),
 
-                        //search textfield
+                          //search textfield
 
-                        child: TextField(
-                          controller: _searchQueryController,
-                          onChanged: (value) {
-                            searchProducts(value); // Call the searchProducts function with the updated search query
-                          },
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey.shade400),
-                              borderRadius: BorderRadius.all(Radius.circular(40)),
+                          child: TextField(
+                            controller: _searchQueryController,
+                            onChanged: (value) {
+                                searchProducts(value);
+
+                            },
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey.shade400),
+                                borderRadius: BorderRadius.all(Radius.circular(40)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(40),
+                                borderSide: BorderSide(color: Colors.grey.shade400),),
+                              fillColor: Colors.white,
+                              filled: true ,
+                              hintText: "Search",
+                              hintStyle: TextStyle( color: Colors.grey.shade500,height: 3),
+                              prefixIcon: Icon(Icons.search),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(40),
-                              borderSide: BorderSide(color: Colors.grey.shade400),),
-                            fillColor: Colors.white,
-                            filled: true ,
-                            hintText: "Search",
-                            hintStyle: TextStyle( color: Colors.grey.shade500,height: 3),
-                            prefixIcon: Icon(Icons.search),
                           ),
                         ),
                       ),
                      const SizedBox(height: 10,),
-
+                      //table name
+                      Container(
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String?>(
+                            value: selectedValue,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedValue = newValue;
+                              });
+                            },
+                            icon: Opacity(
+                              opacity: 0.0, // Set the opacity to 0 for complete transparency
+                              child: Icon(Icons.arrow_drop_down), // Replace with your desired icon
+                            ),
+                            items: dropdownValues.map((String? value) {
+                              return DropdownMenuItem<String?>(
+                                value: value,
+                                child: Text(
+                                  value.toString(),
+                                  style: TextStyle(
+                                    color: value == selectedValue ? Colors.transparent : Colors.black,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
 
                       //Slider of home page
 
@@ -393,40 +471,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 15,),
 
 
-                      /*    ElevatedButton(
-                            onPressed: () {
-                              _pageController.animateToPage(0, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
-                              setState(() {
-                                _currentIndex = 0;
-                              });
-                            },
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                _currentIndex == 0 ? Colors.redAccent : Colors.white,
-                              ),
-                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.menu_book,
-                                  color: _currentIndex == 0 ? Colors.white : Colors.black,
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  'Petite Déjouner',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    color: _currentIndex == 0 ? Colors.white : Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),*/
                       // list of categories
                       SizedBox(
                         height: 50,
@@ -603,6 +647,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Divider()
                               ),
                               SizedBox(height: 15,),
+
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
@@ -646,12 +691,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 ),
                                               ),
                                               title: Text(selectedProduct.name!),
-                                              subtitle: Text('Prix: \$${selectedProduct.prix!.toStringAsFixed(2)}'),
+                                              subtitle: Text('Prix: ${selectedProduct.prix!.toStringAsFixed(2)} DH'),
                                               trailing: IconButton(
                                                 icon: Icon(Icons.close),
                                                 onPressed: () {
                                                   setState(() {
                                                     selectedProducts.removeAt(index);
+                                                    _orderVM.handleremoveproduct(produitModel: selectedProduct, name_table: selectedValue);
                                                   });
                                                 },
                                               ),

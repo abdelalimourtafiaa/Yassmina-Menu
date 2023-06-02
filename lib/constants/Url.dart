@@ -3,6 +3,7 @@ const baseURL = 'http://127.0.0.1:8000/api';
 
 const productURL = baseURL + '/getProducts';
 const categoryURL = baseURL + '/getCategory';
+const tableURL = baseURL + '/gettable';
 const orderURL = baseURL + '/order' ;
 
 // ----- Errors -----
