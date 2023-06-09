@@ -375,7 +375,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     // mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 15,),
+                      const SizedBox(height: 10,),
 
                       Center(
                         child: Container(
@@ -412,7 +412,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-                     const SizedBox(height: 10,),
                       //table name
                       Container(
                         child: DropdownButtonHideUnderline(
@@ -450,7 +449,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         {"id": 3, "image_path": 'Icons/Yasmina1.png'},
                         {"id": 2, "image_path": 'Icons/LogoYassmina.png'}
 
-                      ], itemWidth: 450, itemHeight: 130,),
+                      ], itemWidth: 280, itemHeight: 150,),
 
                       //text
                       Container(
@@ -472,72 +471,74 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
                       // list of categories
-                      SizedBox(
-                        height: 50,
-                        child:
-                        ListView.builder (
-                          scrollDirection: Axis.horizontal,
-                          itemCount: category.length,
-                          itemBuilder: (context, index) {
-                            CategorieModel currentCategory = category[index];
-                            return Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Center(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _currentIndex = index;
-                                      getProductByCategory(category[index].id!);
-                                      print("her is the id of my category: ${category[index].id}");
-                                    });
-                                    _pageController.animateToPage(
-                                      _currentIndex,
-                                      duration: Duration(milliseconds: 10),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all<Color>(
-                                      _currentIndex == index ? Colors.redAccent : Colors.white,
-                                    ),
-                                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                                          (Set<MaterialState> states) {
-                                        if (states.contains(MaterialState.pressed)) return Colors.redAccent;
-                                        return null;
-                                      },
-                                    ),
-                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
+                      Center(
+                        child: SizedBox(
+                          height: 50,
+                          child:
+                          ListView.builder (
+                            scrollDirection: Axis.horizontal,
+                            itemCount: category.length,
+                            itemBuilder: (context, index) {
+                              CategorieModel currentCategory = category[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 10,right: 20),
+                                child: Center(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _currentIndex = index;
+                                        getProductByCategory(category[index].id!);
+                                        print("her is the id of my category: ${category[index].id}");
+                                      });
+                                      _pageController.animateToPage(
+                                        _currentIndex,
+                                        duration: Duration(milliseconds: 10),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    },
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all<Color>(
+                                        _currentIndex == index ? Colors.redAccent : Colors.white,
+                                      ),
+                                      overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                                            (Set<MaterialState> states) {
+                                          if (states.contains(MaterialState.pressed)) return Colors.redAccent;
+                                          return null;
+                                        },
+                                      ),
+                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30.0),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width:24,
-                                        height:24,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: NetworkImage('${currentCategory.icon!}'),
-                                            fit: BoxFit.cover,
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width:24,
+                                          height:24,
+                                          decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                              image: NetworkImage('${currentCategory.icon!}'),
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        currentCategory.name_category!,
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          color: _currentIndex == index ? Colors.white : Colors.black,
+                                        SizedBox(width: 10),
+                                        Text(
+                                          currentCategory.name_category!,
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            color: _currentIndex == index ? Colors.white : Colors.black,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
                       // list of productes

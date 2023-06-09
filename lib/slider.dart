@@ -52,7 +52,7 @@ class _AutoplayListViewState extends State<AutoplayListView> {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        height: 200,
+        height: 150,
         child: Row(
           children: [
             Expanded(
@@ -80,8 +80,8 @@ class _AutoplayListViewState extends State<AutoplayListView> {
                     options: CarouselOptions(
                       enableInfiniteScroll: true,
                       autoPlay: false,
-                      viewportFraction: 0.3,
-                      aspectRatio: 6.5,
+                      viewportFraction: 0.2,
+                      aspectRatio: 8.7,
                       initialPage: _currentIndex,
                       onPageChanged: (index, _) {
                         setState(() {
